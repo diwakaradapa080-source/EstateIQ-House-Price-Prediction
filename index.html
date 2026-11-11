@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}EstateIQ | Smart Property Valuation{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-copy"><div class="eyebrow"><span class="eyebrow-line"></span> REAL ESTATE · PREDICTIVE ANALYTICS</div>
+    <h1>Know the value.<br><em>Before you buy.</em></h1>
+    <p class="hero-sub">An intelligent house price estimation tool powered by regression models. Enter property details to generate an instant data-driven estimate.</p>
+    <div class="hero-points"><span>✓ ML-powered estimate</span><span>✓ Model comparison</span><span>✓ Instant results</span></div>
+  </div>
+  <div class="hero-art"><div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div><div class="art-house"><div class="roof"></div><div class="house-body"><div class="window"></div><div class="door"></div></div></div><div class="art-tag"><small>ESTIMATED VALUE</small><strong>₹ 84.5L</strong><span>Illustrative preview</span></div></div>
+</section>
+<section class="metric-strip">
+  <div><small>DATASET RECORDS</small><strong>{{ "{:,}".format(meta.dataset_rows) }}</strong><span>Practice samples</span></div>
+  <div><small>MODELS EVALUATED</small><strong>{{ meta.metrics|length }}</strong><span>Regression algorithms</span></div>
+  <div><small>SELECTED MODEL</small><strong class="metric-model">{{ meta.best_model }}</strong><span>Based on test R²</span></div>
+  <div><small>INPUT FEATURES</small><strong>06</strong><span>Property attributes</span></div>
+</section>
+<section class="workspace">
+  <div class="section-heading"><div><div class="eyebrow">01 / PROPERTY DETAILS</div><h2>Build your estimate</h2><p>Adjust the property information below. All fields are required.</p></div><span class="step-chip">PREDICTION ENGINE <b>● READY</b></span></div>
+  <div class="workspace-grid">
+    <section class="form-card">
+      <form method="POST">
+        <div class="form-grid">
+          <label><span>Built-up area <small>Square feet</small></span><div class="input-wrap"><input type="number" name="area_sqft" min="1" max="50000" value="{{ values.area_sqft }}" required><b>sq.ft</b></div></label>
+          <label><span>Bedrooms <small>Number of rooms</small></span><div class="input-wrap"><input type="number" name="bedrooms" min="1" max="20" value="{{ values.bedrooms }}" required><b>BED</b></div></label>
+          <label><span>Bathrooms <small>Full bathrooms</small></span><div class="input-wrap"><input type="number" name="bathrooms" min="1" max="20" value="{{ values.bathrooms }}" required><b>BATH</b></div></label>
+          <label><span>Property age <small>Years since construction</small></span><div class="input-wrap"><input type="number" name="age_years" min="0" max="200" value="{{ values.age_years }}" required><b>YRS</b></div></label>
+          <label><span>Location score <small>Illustrative score from 1–10</small></span><div class="input-wrap"><input type="number" name="location_score" min="1" max="10" value="{{ values.location_score }}" required><b>/ 10</b></div></label>
+          <label><span>Parking spaces <small>Available car parking</small></span><div class="input-wrap"><input type="number" name="parking_spaces" min="0" max="20" value="{{ values.parking_spaces }}" required><b>SPACES</b></div></label>
+        </div>
+        <button class="primary-btn" type="submit">Generate price estimate <span>↗</span></button>
+        <p class="form-footnote"><span>⌁</span> Your inputs are processed locally by the prediction model.</p>
+      </form>
+      {% if error %}<div class="alert">{{ error }}</div>{% endif %}
+    </section>
+    <aside class="result-card">
+      <div class="result-top"><span class="result-icon">↗</span><span class="live-label">LIVE ESTIMATE</span></div>
+      {% if prediction is not none %}
+        <div class="result-label">Estimated property value</div><div class="price">₹{{ "{:,.0f}".format(prediction) }}</div>
+        <div class="result-caption">Generated using {{ details.model }}.</div>
+        <div class="result-divider"></div>
+        <div class="result-detail"><span>Property area</span><b>{{ "{:,.0f}".format(details.area) }} sq.ft</b></div>
+        <div class="result-detail"><span>Generated at</span><b>{{ details.created }}</b></div>
+        <div class="result-disclaimer">This is a model estimate, not a certified property valuation.</div>
+      {% else %}
+        <div class="empty-result"><div class="empty-icon">₹</div><h3>Your estimate<br>will appear here.</h3><p>Complete the property details and run the prediction engine to see the estimated value.</p></div>
+        <div class="result-divider"></div><div class="result-detail"><span>Prediction model</span><b>{{ meta.best_model }}</b></div><div class="result-detail"><span>Response</span><b class="green">Instant</b></div>
+      {% endif %}
+    </aside>
+  </div>
+</section>
+{% if history %}
+<section class="history-section"><div class="section-heading compact"><div><div class="eyebrow">02 / RECENT ACTIVITY</div><h2>Recent estimates</h2></div><span class="muted">This browser session</span></div>
+<div class="history-list">{% for item in history %}<div class="history-row"><span class="history-dot"></span><span>{{ "{:,.0f}".format(item.area) }} sq.ft property</span><b>₹{{ "{:,.0f}".format(item.price) }}</b><small>{{ item.created }}</small></div>{% endfor %}</div></section>
+{% endif %}
+<section class="bottom-cta"><div><div class="eyebrow">EXPLORE THE MODEL</div><h2>See the data behind the estimate.</h2><p>Review model evaluation metrics, dataset statistics and the project methodology.</p></div><a class="secondary-btn" href="/dashboard">Explore insights <span>→</span></a></section>
+<p class="data-note">DATA TRANSPARENCY: This project currently uses a synthetic practice dataset. Outputs demonstrate an ML workflow and must not be treated as real market valuations.</p>
+{% endblock %}
